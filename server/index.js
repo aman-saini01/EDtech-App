@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-		  origin: 'https://edtech-app-git-main-aman-saini01s-projects.vercel.app',
+		  origin: 'https://learnquest-rouge.vercel.app/',
 		credentials: true,
 	})
 );
