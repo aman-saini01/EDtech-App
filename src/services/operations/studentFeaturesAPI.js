@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast"
 
-import rzpLogo from "../../assets/Logo/rzp_logo.png"
+import razorLearnquest from "../../assets/Logo/razorLearnquest.png"
 import { resetCart } from "../../slices/cartSlice"
 import { setPaymentLoading } from "../../slices/courseSlice"
 import { apiConnector } from "../apiConnector"
@@ -70,9 +70,9 @@ export async function BuyCourse(
       currency: orderResponse.data.data.currency,
       amount: `${orderResponse.data.data.amount}`,
       order_id: orderResponse.data.data.id,
-      name: "StudyNotion",
+      name: "Learn Quest",
       description: "Thank you for Purchasing the Course.",
-      image: rzpLogo,
+      image: razorLearnquest,
       prefill: {
         name: `${user_details.firstName} ${user_details.lastName}`,
         email: user_details.email,
