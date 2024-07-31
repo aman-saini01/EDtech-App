@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-		  origin: 'https://learnquest-gules.vercel.app',
+		  origin: 'https://learnquest-beryl.vercel.app',
 		credentials: true,
 	})
 );
