@@ -78,8 +78,14 @@ function Navbar() {
                           <p className="text-center">Loading...</p>
                         ) : subLinks.length ? (
 
-                          <>
-                             {subLinks
+                        <>
+                            {subLinks
+                              ?.filter(
+                                (subLink) =>
+                                  subLink?.courses &&
+                                  Array.isArray(subLink.courses) &&
+                                  subLink.courses.length > 0
+                              )
                               ?.map((subLink, i) => (
                                 <Link
                                   to={`/catalog/${subLink.name
@@ -92,7 +98,7 @@ function Navbar() {
                                   <p>{subLink.name}</p>
                                 </Link>
                               ))}
-                            </>
+                        </>
                         ) : (
                           <p className="text-center">No Courses Found</p>
                         )}
@@ -160,6 +166,22 @@ function Navbar() {
               <ul className="flex flex-col items-center gap-y-4 text-richblack-25">
                 {NavbarLinks.map((link, index) => (
                   <li key={index}>
+                    {link.title==="catalog" ? 
+                    (
+                      <div className="w-[200px] h-[100px]">
+                        {subLinks.map((subLink, index) =>(
+                          <Link>
+                            {subLink.name}
+                          </Link>
+                        )
+
+                        )}
+                      </div>
+                    ) 
+                    : (
+                      <div>
+
+                      </div>)}
                     <Link to={link?.path} onClick={() => setIsMenuOpen(false)}>
                       <p
                         className={`${
