@@ -4,14 +4,12 @@ import { BsChevronDown } from "react-icons/bs"
 import { useSelector } from "react-redux"
 import { Link, matchPath, useLocation } from "react-router-dom"
 
-import logo from "../../assets/Logo/learnquest.png"
+import logo from "../../assets/Logo/Logo-Full-Light.png"
 import { NavbarLinks } from "../../data/navbar-links"
 import { apiConnector } from "../../services/apiConnector"
 import { categories } from "../../services/apis"
 import { ACCOUNT_TYPE } from "../../utils/constants"
 import ProfileDropdown from "../core/Auth/ProfileDropdown"
-
-
 
 function Navbar() {
   const { token } = useSelector((state) => state.auth)
@@ -21,15 +19,15 @@ function Navbar() {
 
   const [subLinks, setSubLinks] = useState([])
   const [loading, setLoading] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false) 
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false)
+
   useEffect(() => {
     (async () => {
       setLoading(true)
       try {
         const res = await apiConnector("GET", categories.CATEGORIES_API)
-        console.log("categories api res", res);
         setSubLinks(res.data.data)
-        console.log("sublink name", res.data.data)
       } catch (error) {
         console.log("Could not fetch Categories.", error)
       }
@@ -37,10 +35,8 @@ function Navbar() {
     })()
   }, [])
 
-
   const matchRoute = (route) => {
-    if (!route) return false;
-    return matchPath({ path: route, exact: true }, location.pathname)
+    return route ? matchPath({ path: route }, location.pathname) : false
   }
 
   return (
@@ -52,60 +48,48 @@ function Navbar() {
       <div className="flex w-11/12 max-w-maxContent items-center justify-between">
         {/* Logo */}
         <Link to="/">
-        <img src={logo} alt="Logo" width={230} height={35} loading="lazy" />
+          <img src={logo} alt="Logo" width={160} height={32} loading="lazy" />
         </Link>
 
-        {/* Navigation links */}
+        {/* Navigation links for desktop */}
         <nav className="hidden md:block">
           <ul className="flex gap-x-6 text-richblack-25">
             {NavbarLinks.map((link, index) => (
               <li key={index}>
                 {link.title === "Catalog" ? (
-                    <div>
-                     <>
-                     <div
-                      className={`group relative flex cursor-pointer items-center gap-1 ${
+                  <div className="group relative flex cursor-pointer items-center gap-1">
+                    <p
+                      className={`${
                         matchRoute("/catalog/:catalogName")
                           ? "text-yellow-25"
                           : "text-richblack-25"
                       }`}
-                      >
-                      <p>{link.title}</p>
-                      <BsChevronDown />
-                      <div className="invisible absolute left-[50%] top-[100%] z-[1000] flex w-[200px] translate-x-[-50%] translate-y-[3em] flex-col rounded-lg bg-richblack-5 p-4 text-richblack-900 opacity-0 transition-all duration-150 group-hover:visible group-hover:translate-y-[1.65em] group-hover:opacity-100 lg:w-[300px]">
-                        <div className="absolute left-[50%] top-0 -z-10 h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-5"></div>
-                        {loading ? (
-                          <p className="text-center">Loading...</p>
-                        ) : subLinks.length ? (
-
-                        <>
-                            {subLinks
-                              ?.filter(
-                                (subLink) =>
-                                  subLink?.courses &&
-                                  Array.isArray(subLink.courses) &&
-                                  subLink.courses.length > 0
-                              )
-                              ?.map((subLink, i) => (
-                                <Link
-                                  to={`/catalog/${subLink.name
-                                    .split(" ")
-                                    .join("-")
-                                    .toLowerCase()}`}
-                                  className="rounded-lg bg-transparent py-4 pl-4 hover:bg-richblack-50"
-                                  key={i}
-                                >
-                                  <p>{subLink.name}</p>
-                                </Link>
-                              ))}
-                        </>
-                        ) : (
-                          <p className="text-center">No Courses Found</p>
-                        )}
-                      </div>
+                    >
+                      {link.title}
+                    </p>
+                    <BsChevronDown />
+                    <div className="invisible absolute left-[50%] top-[50%] z-[1000] flex w-[200px] translate-x-[-50%] translate-y-[3em] flex-col rounded-lg bg-richblack-5 p-4 text-richblack-900 opacity-0 transition-all duration-150 group-hover:visible group-hover:translate-y-[1.65em] group-hover:opacity-100 lg:w-[300px]">
+                      <div className="absolute left-[50%] top-0 -z-10 h-6 w-6 translate-x-[80%] translate-y-[-40%] rotate-45 select-none rounded bg-richblack-5"></div>
+                      {loading ? (
+                        <p className="text-center">Loading...</p>
+                      ) : subLinks.length ? (
+                        subLinks.map((subLink, i) => (
+                          <Link
+                            to={`/catalog/${subLink.name
+                              .split(" ")
+                              .join("-")
+                              .toLowerCase()}`}
+                            className="rounded-lg bg-transparent py-4 pl-4 hover:bg-richblack-50"
+                            key={i}
+                          >
+                            <p>{subLink.name}</p>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="text-center">No Courses Found</p>
+                      )}
                     </div>
-                    </>
-                     </div>
+                  </div>
                 ) : (
                   <Link to={link?.path}>
                     <p
@@ -123,6 +107,7 @@ function Navbar() {
             ))}
           </ul>
         </nav>
+
         {/* Login / Signup / Dashboard */}
         <div className="hidden items-center gap-x-4 md:flex">
           {user && user?.accountType !== ACCOUNT_TYPE.INSTRUCTOR && (
@@ -136,21 +121,22 @@ function Navbar() {
             </Link>
           )}
           {token === null && (
-            <Link to="/login">
-              <button className="rounded-[8px] border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100">
-                Log in
-              </button>
-            </Link>
-          )}
-          {token === null && (
-            <Link to="/signup">
-              <button className="rounded-[8px] border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100">
-                Sign up
-              </button>
-            </Link>
+            <>
+              <Link to="/login">
+                <button className="rounded-[8px] border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100">
+                  Log in
+                </button>
+              </Link>
+              <Link to="/signup">
+                <button className="rounded-[8px] border border-richblack-700 bg-richblack-800 px-[12px] py-[8px] text-richblack-100">
+                  Sign up
+                </button>
+              </Link>
+            </>
           )}
           {token !== null && <ProfileDropdown />}
         </div>
+
         {/* Hamburger Menu for small screens */}
         <button
           className="mr-4 md:hidden"
@@ -166,33 +152,61 @@ function Navbar() {
               <ul className="flex flex-col items-center gap-y-4 text-richblack-25">
                 {NavbarLinks.map((link, index) => (
                   <li key={index}>
-                    {link.title==="catalog" ? 
-                    (
-                      <div className="w-[200px] h-[100px]">
-                        {subLinks.map((subLink, index) =>(
-                          <Link>
-                            {subLink.name}
-                          </Link>
-                        )
-
+                    {link.title === "Catalog" ? (
+                      <div>
+                        <div
+                          className="flex items-center cursor-pointer"
+                          onClick={() => setIsCatalogOpen(!isCatalogOpen)}
+                        >
+                          <p
+                            className={`${
+                              isCatalogOpen || matchRoute("/catalog/:catalogName")
+                                ? "text-yellow-25"
+                                : "text-richblack-25"
+                            } transition-colors duration-200`}
+                          >
+                            {link.title}
+                          </p>
+                          <BsChevronDown
+                            className={`ml-2 transition-transform duration-200 ${
+                              isCatalogOpen ? "rotate-180" : "rotate-0"
+                            }`}
+                          />
+                        </div>
+                        {isCatalogOpen && (
+                          <div className="mt-2 w-full">
+                            {subLinks.map((subLink, i) => (
+                              <Link
+                                key={i}
+                                to={`/catalog/${subLink.name
+                                  .split(" ")
+                                  .join("-")
+                                  .toLowerCase()}`}
+                                onClick={() => {
+                                  setIsMenuOpen(false)
+                                  setIsCatalogOpen(false)
+                                }}
+                                className="block w-full py-2 text-center text-richblack-25 hover:bg-richblack-700"
+                              >
+                                {subLink.name}
+                              </Link>
+                            ))}
+                          </div>
                         )}
                       </div>
-                    ) 
-                    : (
-                      <div>
-
-                      </div>)}
-                    <Link to={link?.path} onClick={() => setIsMenuOpen(false)}>
-                      <p
-                        className={`${
-                          matchRoute(link?.path)
-                            ? "text-yellow-25"
-                            : "text-richblack-25"
-                        }`}
-                      >
-                        {link.title}
-                      </p>
-                    </Link>
+                    ) : (
+                      <Link to={link?.path} onClick={() => setIsMenuOpen(false)}>
+                        <p
+                          className={`${
+                            matchRoute(link?.path)
+                              ? "text-yellow-25"
+                              : "text-richblack-25"
+                          }`}
+                        >
+                          {link.title}
+                        </p>
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
